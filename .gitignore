@@ -23,3 +23,6 @@ Thumbs.db
 
 # Sensitive data
 01_crawler/B_wb_comments/weibo_cookies.json
+
+# Stray file
+NUL
