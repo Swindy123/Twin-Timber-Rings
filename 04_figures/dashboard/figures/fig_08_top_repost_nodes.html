@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>图 08 关键转发节点：PageRank 与连接规模</title>
+  <style>
+    :root {
+      --bg: #F5F3EE;
+      --panel: #FFFDF8;
+      --text: #2B2926;
+      --muted: #666666;
+      --grid: #D7CFC4;
+      --accent: #C07858;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Microsoft YaHei", "Noto Sans CJK SC", Arial, sans-serif;
+    }
+    main { max-width: 1180px; margin: 0 auto; padding: 24px; }
+    header { display: flex; justify-content: space-between; gap: 16px; align-items: end; margin-bottom: 16px; }
+    h1 { margin: 0 0 8px; font-size: 24px; line-height: 1.25; letter-spacing: 0; }
+    .subtitle { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.7; }
+    .toolbar { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
+    button {
+      border: 1px solid #cfc7bd;
+      background: #fffdf8;
+      color: var(--text);
+      border-radius: 6px;
+      padding: 7px 10px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    button.active, button:hover { border-color: var(--accent); color: #7a422e; }
+    .chart-wrap {
+      position: relative;
+      background: rgba(255, 253, 248, 0.62);
+      border: 1px solid #ded7ce;
+      border-radius: 8px;
+      padding: 14px;
+      min-height: 560px;
+    }
+    svg { width: 100%; height: 620px; display: block; overflow: visible; }
+    .axis text, .legend text { fill: var(--text); font-size: 12px; }
+    .grid-line { stroke: var(--grid); stroke-dasharray: 4 4; stroke-width: 1; opacity: .72; }
+    .axis-line { stroke: #bdb4aa; stroke-width: 1; }
+    .mark { cursor: pointer; transition: opacity .16s ease, transform .16s ease, filter .16s ease; }
+    .mark.dimmed { opacity: .16; }
+    .mark:hover { opacity: 1; filter: drop-shadow(0 4px 7px rgba(43, 41, 38, .16)); }
+    .label { fill: var(--text); font-size: 12px; paint-order: stroke; stroke: var(--bg); stroke-width: 3px; }
+    .cell-number { fill: #2B2926; font-size: 12px; font-weight: 600; stroke: none; paint-order: normal; pointer-events: none; }
+    #tooltip {
+      position: fixed;
+      pointer-events: none;
+      z-index: 10;
+      max-width: 320px;
+      padding: 10px 12px;
+      border: 1px solid #cfc7bd;
+      border-radius: 6px;
+      background: rgba(255, 253, 248, .96);
+      box-shadow: 0 10px 24px rgba(43, 41, 38, .16);
+      color: var(--text);
+      font-size: 12px;
+      line-height: 1.55;
+      display: none;
+    }
+    #detail {
+      margin-top: 12px;
+      min-height: 44px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+    @media (max-width: 720px) {
+      main { padding: 14px; }
+      header { display: block; }
+      .toolbar { justify-content: flex-start; margin-top: 10px; }
+      .chart-wrap { min-height: 520px; padding: 8px; }
+      svg { height: 560px; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <div>
+        <h1>图 08 关键转发节点：PageRank 与连接规模</h1>
+        <p class="subtitle">横向位置表示 PageRank，圆点大小表示总度数，颜色表示账号类型。</p>
+      </div>
+      <div class="toolbar" id="toolbar"></div>
+    </header>
+    <section class="chart-wrap">
+      <svg id="chart" viewBox="0 0 1080 620" role="img"></svg>
+      <div id="tooltip"></div>
+    </section>
+    <div id="detail">Hover for details. Click an item to pin it here.</div>
+  </main>
+  <script>
+
+const rows = [{"name": "林六月", "pagerank": 0.0004162544579769846, "degree": 5, "type": "普通用户", "color": "#9A8A7A"}, {"name": "会发光的麻袋", "pagerank": 0.0004169755448277215, "degree": 11, "type": "粉丝号", "color": "#C07858"}, {"name": "谢谢你的妍泪成全我的耍赖", "pagerank": 0.0004249251334562472, "degree": 5, "type": "粉丝号", "color": "#C07858"}, {"name": "第八次大大雨--", "pagerank": 0.0004509843891264454, "degree": 5, "type": "普通用户", "color": "#9A8A7A"}, {"name": "爱而为一的小小", "pagerank": 0.00046221493201276917, "degree": 1, "type": "普通用户", "color": "#9A8A7A"}, {"name": "晨辰分不清_haodu", "pagerank": 0.0004653671615692064, "degree": 2, "type": "音乐相关号", "color": "#5A7A6A"}, {"name": "Hy_谦育", "pagerank": 0.00047631456497065146, "degree": 6, "type": "普通用户", "color": "#9A8A7A"}, {"name": "兔子是人间软甜妹", "pagerank": 0.00048509188724760004, "degree": 43, "type": "粉丝号", "color": "#C07858"}, {"name": "呆萌的慧慧酱", "pagerank": 0.00048537329980994655, "degree": 17, "type": "粉丝号", "color": "#C07858"}, {"name": "HAOELE-", "pagerank": 0.0006027132164930832, "degree": 1, "type": "粉丝号", "color": "#C07858"}, {"name": "小肚子再吃就要炸啦", "pagerank": 0.0006027132164930832, "degree": 1, "type": "粉丝号", "color": "#C07858"}, {"name": "耶耶泡死茶_", "pagerank": 0.0006032297024877462, "degree": 1, "type": "粉丝号", "color": "#C07858"}, {"name": "谁偷了我的homework", "pagerank": 0.0006067043118014384, "degree": 3, "type": "粉丝号", "color": "#C07858"}, {"name": "呆小七_", "pagerank": 0.0006164922770731036, "degree": 30, "type": "粉丝号", "color": "#C07858"}, {"name": "蚊子下鸡蛋", "pagerank": 0.0006294893876144867, "degree": 123, "type": "粉丝号", "color": "#C07858"}];
+const svg = document.getElementById("chart"), tooltip = document.getElementById("tooltip"), detail = document.getElementById("detail");
+const W = 1080, H = 620, m = {l: 220, r: 170, t: 34, b: 58};
+const maxX = Math.max(0.000001, ...rows.map(d => d.pagerank));
+const maxD = Math.max(1, ...rows.map(d => d.degree));
+const sx = x => m.l + x / maxX * (W - m.l - m.r);
+const sy = i => m.t + i * ((H - m.t - m.b) / Math.max(1, rows.length - 1));
+function el(name, attrs, parent = svg) { const node = document.createElementNS("http://www.w3.org/2000/svg", name); Object.entries(attrs).forEach(([k,v]) => node.setAttribute(k,v)); parent.appendChild(node); return node; }
+function tip(d) { return `<b>${d.name}</b><br>PageRank：${d.pagerank.toFixed(6)}<br>总度数：${d.degree}<br>账号类型：${d.type}`; }
+for (let i = 0; i <= 5; i++) {
+  const x = m.l + i * (W - m.l - m.r) / 5;
+  el("line", {x1:x, y1:m.t, x2:x, y2:H-m.b, class:"grid-line"});
+  el("text", {x, y:H-m.b+24, "text-anchor":"middle", class:"label"}).textContent = (maxX*i/5).toFixed(4);
+}
+el("line", {x1:m.l, y1:H-m.b, x2:W-m.r, y2:H-m.b, class:"axis-line"});
+rows.forEach((d, i) => {
+  const y = sy(i), x = sx(d.pagerank);
+  el("text", {x:m.l-12, y:y+4, "text-anchor":"end", class:"label"}).textContent = d.name.slice(0, 22);
+  el("line", {x1:m.l, y1:y, x2:x, y2:y, stroke:d.color, "stroke-width":3, opacity:.46, class:"mark", "data-kind":d.type});
+  const c = el("circle", {cx:x, cy:y, r:7 + Math.sqrt(d.degree/maxD)*18, fill:d.color, stroke:"white", "stroke-width":1.3, class:"mark", "data-kind":d.type});
+  el("text", {x:x+12, y:y+4, class:"label"}).textContent = `度 ${d.degree}`;
+  c.addEventListener("mousemove", e => { tooltip.innerHTML = tip(d); tooltip.style.display = "block"; tooltip.style.left = e.clientX+14+"px"; tooltip.style.top = e.clientY+14+"px"; });
+  c.addEventListener("mouseleave", () => tooltip.style.display = "none");
+  c.addEventListener("click", () => detail.innerHTML = tip(d));
+});
+const types = [...new Set(rows.map(d => d.type))], toolbar = document.getElementById("toolbar");
+["全部", ...types].forEach(k => { const b=document.createElement("button"); b.textContent=k; b.onclick=()=>{ document.querySelectorAll("button").forEach(x=>x.classList.remove("active")); b.classList.add("active"); document.querySelectorAll(".mark").forEach(x=>x.classList.toggle("dimmed", k!=="全部" && x.dataset.kind!==k)); }; toolbar.appendChild(b); });
+toolbar.firstChild.classList.add("active");
+
+  </script>
+</body>
+</html>

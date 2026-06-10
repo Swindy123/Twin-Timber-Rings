@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>双生年轮：微博舆论场中《年轮》原唱与版权争议的传播可视分析</title>
+    <style>
+        :root {
+            --bg-primary: #F5F3EE;
+            --bg-white: #FFFFFF;
+            --zhang-primary: #C07858;
+            --zhang-deep: #9A5A40;
+            --zhang-light: #D8B0A0;
+            --wang-primary: #5A7A6A;
+            --wang-deep: #3A5A4A;
+            --wang-light: #90B0A0;
+            --overlap: #9A8A7A;
+            --neutral: #8C8C8C;
+            --conflict: #A05050;
+            --memory: #D4B898;
+            --legal: #6A8A7A;
+            --mocking: #B08070;
+            --text-primary: #333333;
+            --text-secondary: #666666;
+            --border-light: #E0D8D0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Microsoft YaHei", "Noto Sans SC", "SimHei", sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.7;
+        }
+
+        /* 导航栏 */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(245, 243, 238, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-light);
+            z-index: 1000;
+            padding: 0 2rem;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.8rem 0;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        nav a:hover {
+            background: var(--zhang-light);
+            color: var(--zhang-deep);
+        }
+
+        /* 容器 */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* 章节通用 */
+        section {
+            margin-bottom: 4rem;
+            scroll-margin-top: 80px;
+        }
+
+        .section-header {
+            border-left: 5px solid var(--zhang-primary);
+            padding-left: 1.2rem;
+            margin-bottom: 2rem;
+        }
+
+        .section-header h2 {
+            font-size: 1.8rem;
+            color: var(--wang-deep);
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .section-header .subtitle {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        /* 封面 */
+        #cover {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 6rem 2rem 4rem;
+            background: linear-gradient(180deg, var(--bg-primary) 0%, #EDEAE3 100%);
+        }
+
+        #cover h1 {
+            font-size: 2.8rem;
+            color: var(--wang-deep);
+            font-weight: 700;
+            margin-bottom: 1rem;
+            line-height: 1.3;
+        }
+
+        #cover .subtitle {
+            font-size: 1.3rem;
+            color: var(--overlap);
+            margin-bottom: 2rem;
+            max-width: 700px;
+        }
+
+        #cover .meta {
+            color: var(--neutral);
+            font-size: 0.95rem;
+            margin-bottom: 3rem;
+        }
+
+        #cover img {
+            max-width: 100%;
+            width: 700px;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+
+        .scroll-hint {
+            margin-top: 3rem;
+            color: var(--neutral);
+            font-size: 0.9rem;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        /* 卡片 */
+        .card {
+            background: var(--bg-white);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            border: 1px solid var(--border-light);
+        }
+
+        .card h3 {
+            font-size: 1.3rem;
+            color: var(--zhang-deep);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--zhang-light);
+        }
+
+        /* 图表容器 */
+        .chart-container {
+            background: var(--bg-white);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            border: 1px solid var(--border-light);
+            text-align: center;
+        }
+
+        .chart-title {
+            font-size: 1.1rem;
+            color: var(--wang-deep);
+            font-weight: 600;
+            margin-bottom: 1rem;
+            text-align: left;
+            padding-left: 0.5rem;
+            border-left: 4px solid var(--wang-primary);
+        }
+
+        .chart-container iframe {
+            width: 100%;
+            border: none;
+            border-radius: 8px;
+            background: var(--bg-primary);
+        }
+
+        .chart-scroll-wrap {
+            overflow-x: auto;
+            overflow-y: hidden;
+            -webkit-overflow-scrolling: touch;
+        }
+        .chart-scroll-wrap iframe {
+            display: block;
+        }
+
+        .chart-container img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+
+        .chart-note {
+            text-align: left;
+            margin-top: 1rem;
+            padding: 1rem;
+            background: #FAF8F5;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            border-left: 3px solid var(--memory);
+        }
+
+        /* 双列布局 */
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .two-col { grid-template-columns: 1fr; }
+            #cover h1 { font-size: 2rem; }
+            nav ul { gap: 0.3rem; }
+            nav a { font-size: 0.75rem; padding: 0.2rem 0.5rem; }
+        }
+
+        /* 结论框 */
+        .conclusion-box {
+            background: linear-gradient(135deg, var(--wang-light) 0%, var(--zhang-light) 100%);
+            border-radius: 16px;
+            padding: 2.5rem;
+            color: var(--wang-deep);
+            font-size: 1.1rem;
+            line-height: 1.9;
+        }
+
+        .conclusion-box h3 {
+            color: var(--zhang-deep);
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        /* 配色说明 */
+        .color-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .color-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .color-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+        }
+
+        /* 页脚 */
+        footer {
+            text-align: center;
+            padding: 3rem 2rem;
+            color: var(--neutral);
+            font-size: 0.9rem;
+            border-top: 1px solid var(--border-light);
+            margin-top: 4rem;
+        }
+
+        /* 叙事引言样式 */
+        .narrative-intro {
+            background: linear-gradient(135deg, #FAF8F5 0%, #F0EDE6 100%);
+            border-radius: 12px;
+            padding: 2rem 2.2rem;
+            margin-bottom: 2rem;
+            border-left: 4px solid var(--zhang-primary);
+            font-size: 1.05rem;
+            line-height: 2;
+            color: var(--text-primary);
+        }
+        .narrative-intro p {
+            margin-bottom: 0.8rem;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+        .narrative-intro p::before {
+            content: "▎";
+            position: absolute;
+            left: 0;
+            color: var(--zhang-primary);
+            font-weight: bold;
+        }
+        .narrative-intro p:last-child { margin-bottom: 0; }
+
+        /* 发现高亮框 */
+        .discovery-highlight {
+            background: var(--bg-white);
+            border-radius: 12px;
+            padding: 1.8rem 2rem;
+            margin: 1.5rem 0;
+            border: 1px solid var(--border-light);
+            box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+        }
+        .discovery-highlight h4 {
+            color: var(--conflict);
+            font-size: 1.15rem;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+        .discovery-highlight p {
+            color: var(--text-secondary);
+            line-height: 1.9;
+            font-size: 0.95rem;
+        }
+        .discovery-highlight .evidence {
+            display: inline-block;
+            background: var(--memory);
+            color: var(--zhang-deep);
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+        }
+
+        /* Case 标题 */
+        .case-title {
+            font-size: 1.3rem;
+            color: var(--wang-deep);
+            font-weight: 700;
+            margin: 2.5rem 0 1.2rem;
+            padding-left: 1rem;
+            border-left: 4px solid var(--conflict);
+        }
+
+        /* 重复文本样式 */
+        .repeated-text {
+            background: #FAF8F5;
+            border-radius: 8px;
+            padding: 1.2rem 1.5rem;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.8;
+            border-left: 3px solid var(--mocking);
+        }
+    </style>
+</head>
+<body>
+
+<!-- 导航 -->
+<nav>
+    <ul>
+        <li><a href="#cover">封面</a></li>
+        <li><a href="#problem">研究问题</a></li>
+        <li><a href="#data">数据说明</a></li>
+        <li><a href="#timeline">时间线与热度</a></li>
+        <li><a href="#stance">立场分布</a></li>
+        <li><a href="#network">传播网络</a></li>
+        <li><a href="#keywords">关键词叙事</a></li>
+        <li><a href="#discoveries">有趣的发现</a></li>
+        <li><a href="#conclusion">总结</a></li>
+    </ul>
+</nav>
+
+<!-- 封面 -->
+<section id="cover">
+    <h1>双生年轮</h1>
+    <p class="subtitle">微博舆论场中《年轮》原唱与版权争议的传播可视分析</p>
+    <p class="meta">数据可视化课程项目 · 基于微博及多平台文本数据的传播分析</p>
+    <img src="figures/fig_13_twin_rings.png" alt="双生年轮主视觉" style="max-width:100%; width:700px; border-radius:12px; box-shadow:0 10px 40px rgba(0,0,0,0.1);">
+    <p class="scroll-hint">↓ 向下滚动开始探索</p>
+</section>
+
+<div class="container">
+
+<!-- 研究问题 -->
+<section id="problem">
+    <div class="section-header">
+        <h2>研究问题</h2>
+        <p class="subtitle">同一首《年轮》，如何在微博舆论场中分裂为两套并行叙事？</p>
+    </div>
+
+    <div class="card">
+        <p>2025年7月，千万粉丝网红歌手<strong>旺仔小乔</strong>在直播翻唱《年轮》时，坚称"原唱只有张碧晨"，否认词曲作者汪苏泷的原唱身份。一句言论意外引爆了汪苏泷与张碧晨之间长达十年的版权归属争议。7月25日凌晨，汪苏泷方宣布<strong>收回《年轮》所有演唱授权</strong>；两小时后，张碧晨工作室发布声明，主张张碧晨为"唯一原唱"，并贴出2015年6月15日的首发时间线证据。随后，双方粉丝在微博展开激烈论战，话题迅速冲上热搜。</p>
+    </div>
+
+    <div class="narrative-intro">
+        <p>2025年的微博《年轮》之争开始了………………</p>
+        <p>"同一首歌吵了两个月，吵的到底是什么？"</p>
+        <p>"张碧晨是原唱——这话哪儿错了？"</p>
+        <p>"微博上两拨人吵架，用的词竟然完全不一样——你信吗？"</p>
+        <p>"为什么有人说'双原唱'，有人说'唯一原唱'——到底是几个原唱？"</p>
+    </div>
+
+    <div class="card">
+        <p>本项目以微博数据为主、辅助平台为对照，围绕这场争议，通过可视化揭示社交网络中的传播模式、叙事分化与平台差异。</p>
+        <br>
+        <p>核心研究问题包括：</p>
+        <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+            <li>这场争议是<strong>如何从普通讨论变成舆论事件</strong>的？</li>
+            <li>网友到底在<strong>支持谁</strong>？</li>
+            <li>这场争议是通过<strong>谁传播出去</strong>的？</li>
+            <li>大家讨论的<strong>到底是什么</strong>？</li>
+        </ul>
+    </div>
+</section>
+
+<!-- 数据说明 -->
+<section id="data">
+    <div class="section-header">
+        <h2>数据说明</h2>
+        <p class="subtitle">数据来源、字段、清洗与标注规则</p>
+    </div>
+    <div class="two-col">
+        <div class="card">
+            <h3>数据来源</h3>
+            <ul style="margin-left: 1.2rem;">
+                <li>微博主帖、评论、转发数据（weibo_posts_clean.csv 等）</li>
+                <li>转发关系网络（repost_edges.csv, repost_nodes.csv）</li>
+                <li>多平台对照案例（platform_cases_clean.csv）</li>
+                <li>时间线事件标注（media_events.csv）</li>
+            </ul>
+        </div>
+        <div class="card">
+            <h3>标注维度</h3>
+            <ul style="margin-left: 1.2rem;">
+                <li><strong>粉籍 author_type</strong>：汪苏泷粉丝 / 张碧晨粉丝 / 汪方水军 / 张方水军 / 路人 / 媒体 / 官方</li>
+                <li><strong>立场 stance</strong>：支持张碧晨 / 支持汪苏泷 / 中立 / 反感饭圈 / 无法判断</li>
+                <li><strong>叙事框架 frame</strong>：原唱身份 / 版权授权 / 创作者身份 / 回忆情绪 / 法律解释 / 粉丝冲突 / 平台营销号</li>
+                <li><strong>事件阶段 event_stage</strong>：爆发前 / 爆发期 / 回应期 / 争论期 / 冷却期</li>
+            </ul>
+        </div>
+    </div>
+    <div class="card">
+        <h3>统一配色依据</h3>
+        <p style="margin-bottom: 1rem;">本项目采用<strong>赤陶赭石</strong>与<strong>松烟墨绿</strong>的冷暖对照，表达"双生叙事"从共同记忆到自然分裂的过程：</p>
+        <div class="color-legend">
+            <div class="color-item"><div class="color-dot" style="background:#C07858"></div>张碧晨叙事（原唱/OST/温暖回忆）</div>
+            <div class="color-item"><div class="color-dot" style="background:#5A7A6A"></div>汪苏泷叙事（创作者/版权/理性生长）</div>
+            <div class="color-item"><div class="color-dot" style="background:#9A8A7A"></div>重叠/共性区（共同记忆/混合叙事）</div>
+            <div class="color-item"><div class="color-dot" style="background:#8C8C8C"></div>中立讨论 / 背景参照</div>
+            <div class="color-item"><div class="color-dot" style="background:#A05050"></div>冲突情绪 / 饭圈争吵 / 裂纹</div>
+            <div class="color-item"><div class="color-dot" style="background:#D4B898"></div>回忆情绪 / 怀旧 / 情感沉淀</div>
+            <div class="color-item"><div class="color-dot" style="background:#6A8A7A"></div>法律版权 / 授权解释 / 考据</div>
+        </div>
+        <p style="font-size: 0.9rem; color: var(--text-secondary);">配色灵感直接取自"年轮"的大地属性——赤陶如树木心材的温暖记忆，松烟如外层年轮的持续生长。重叠区采用半透明混合，使共性话题在视觉上自然呈现灰褐融合色。</p>
+    </div>
+</section>
+
+<!-- 事件时间线与热度趋势 -->
+<section id="timeline">
+    <div class="section-header">
+        <h2>事件时间线与热度趋势</h2>
+        <p class="subtitle">问题1：这场争议是如何从普通讨论变成舆论事件的？</p>
+    </div>
+
+    <div class="chart-container">
+        <div class="chart-title">1 事件时间线：从共同记忆到争议爆发</div>
+        <img src="figures/fig_01_event_timeline.png" alt="事件时间线：从共同记忆到争议爆发" style="width:100%; max-width:2100px; height:auto; border-radius:8px;">
+        <div class="chart-note">
+            本图以 “<strong>原唱叙事</strong> / <strong>版权叙事</strong> / <strong>媒体事件</strong>” 三条平行时间轴，完整还原了从 2015 年歌曲诞生到 2025 年争议爆发的关键节点。事件并非突然引爆，而是由多轮媒体操作、当事人声明和粉丝行动层层递进推动，两套叙事并行发酵，最终形成 “双生年轮” 的对立格局。
+        </div>
+    </div>
+
+    <div class="chart-container">
+        <div class="chart-title">2 热度趋势：微博讨论量的阶段性爆发</div>
+        <iframe src="figures/fig_02_heat_trend.html" style="width:100%; height:980px; border:none; border-radius:8px; background:var(--bg-primary);"></iframe>
+        <div class="chart-note">
+            本图展示了 2025 年 7 月 22 日至 8 月 10 日期间，发帖量、评论量、转发量三项互动指标的变化。热度呈现清晰的<strong>脉冲式爆发</strong>特征：评论量在 7 月 25 日（汪苏泷收回授权、张碧晨声明）达到峰值，发帖量在 7 月 31 日（汪苏泷合肥演唱会演唱《年轮》）达到峰值，转发量在 8 月 4 日（粉丝澄清抽奖）达到次高峰，每一次热度跃升都与关键事件强绑定。争议不是慢慢升温的，而是被一个个事件节点点燃的。
+        </div>
+    </div>
+
+    <div class="discovery-highlight">
+        <h4>🔍 关键洞察：节点触发型传播</h4>
+        <p>《年轮》争议并非“慢慢吵起来”的。每一次热度跃升都对应一个具体的引爆点：旺仔小乔直播言论点燃引线，QQ 音乐移除“原唱”标签放大矛盾，汪苏泷收回授权将版权问题摆上台面，张碧晨工作室声明让双方立场彻底公开化——随后粉丝大规模入场，舆论场全面引爆。<strong>在社交媒体环境中，争议不是累积出来的，是被一个接一个的信号弹打出来的。</strong>不同引爆点触发的互动类型也不同：当事人声明引发评论量暴涨，公开演唱推动发帖量激增，粉丝运营带动转发量冲高，事件驱动下的传播节奏各有侧重。</p>
+    </div>
+</section>
+
+<!-- 立场分布与立场对比 -->
+<section id="stance">
+    <div class="section-header">
+        <h2>立场分布与立场对比</h2>
+        <p class="subtitle">问题2：网友到底在支持谁？</p>
+    </div>
+
+    <div class="chart-container">
+        <div class="chart-title">3 立场分布：原唱与版权叙事的分化</div>
+        <iframe src="figures/fig_03_stance_distribution.html" style="width:100%; height:860px; border:none; border-radius:8px; background:var(--bg-primary);"></iframe>
+        <div class="chart-note">
+            环形图呈现事件全周期网民立场分布：<strong>中立/无法判断占比最高（38.7%）</strong>，支持汪苏泷（33.1%）次之，反感饭圈争议（15.4%）、支持张碧晨（12.9%）占比较低，直观体现了围观者居多、阵营分化集中的舆论特征。
+        </div>
+    </div>
+
+    <div class="chart-container">
+        <div class="chart-title">4 主帖 vs 评论 vs 转发立场对比</div>
+        <img src="figures/fig_19_posts_vs_comments_stance.png" alt="主帖 vs 评论 vs 转发立场对比" style="width:100%; max-width:2100px; height:auto; border-radius:8px;">
+        <div class="chart-note">
+            将数据拆分为主帖、评论、转发三个子集对比不同场域的立场差异：主帖中支持汪苏泷占压倒性60.1%，评论区中反感饭圈以30.0%紧逼汪方36.2%，转发区则呈现极端立场极化（汪方66.1%、张方33.9%，中立与反感饭圈均为零）。<strong>三个场域，三种舆论气候。</strong>
+        </div>
+    </div>
+
+    <div class="chart-container">
+        <div class="chart-title">5 立场流变：网友态度的阶段演化</div>
+        <iframe src="figures/fig_05_stance_over_time.html" style="width:100%; height:860px; border:none; border-radius:8px; background:var(--bg-primary);"></iframe>
+        <div class="chart-note">
+            按事件阶段追踪网民态度变化：反感饭圈在争议发酵期即达峰值（35.2%），并非逐渐升温——"烦死了别吵了"与事件同步爆发。支持汪苏泷在版权争论期拉升至最高（40.7%），汪方优势自始至终存在。中立始终在16%–21%，多数人从一开始就在站队。冷却期的立场结构与争议发酵期高度相似——<strong>舆论降温是音量变小，不是立场变了。</strong>
+        </div>
+    </div>
+
+    <div class="discovery-highlight">
+        <h4>🔍 关键洞察：叙事分裂与立场极化</h4>
+        <p>《年轮》争议的舆论并非简单的两派对立，而是呈现<strong>三层结构</strong>：中立围观者、两大叙事阵营、反饭圈理性群体。全周期中，支持汪苏泷的版权叙事阵营占比始终高于支持张碧晨的情感叙事阵营，体现出<strong>法理视角在舆论中的更高共识度</strong>。事件推进中，中立讨论被持续挤压，阵营对立情绪快速走高，反感饭圈争议的声音在中期成为主流，反映出网民对粉丝对立行为的普遍抵触。整体立场随事件节点逐步固化，最终形成法理叙事占优、情感叙事边缘化的舆论格局。</p>
+    </div>
+</section>
+
+<!-- 传播网络与核心节点 -->
+<section id="network">
+    <div class="section-header">
+        <h2>传播网络与核心节点</h2>
+        <p class="subtitle">问题3：这场争议是通过谁传播出去的？</p>
+    </div>
+
+    <div class="chart-container">
+        <div class="chart-title">6 传播网络：核心微博与转发节点</div>
+        <iframe src="figures/fig_06_repost_network.html" style="width:100%; height:980px; border:none; border-radius:8px; background:var(--bg-primary);"></iframe>
+        <div class="chart-note">
+            原曲《年轮》如一棵十年大树，这场争议的传播同样盘根错节。全量转发网络（3034个节点、3198条边）呈<strong>多中心辐射结构</strong>，核心源微博与头部节点如同粗壮的枝干，撑起整张传播网络。不同立场的节点颜色泾渭分明，却通过跨阵营转发产生纠缠，争议正是在这种交错中不断扩散、激化。张碧晨核心源节点使用 <span style="color:#9A5A40;font-weight:bold;">赤陶深 #9A5A40</span>，汪苏泷核心源节点使用 <span style="color:#3A5A4A;font-weight:bold;">松烟深 #3A5A4A</span>，跨阵营连线使用重叠色 <span style="color:#9A8A7A;font-weight:bold;">#9A8A7A</span>。
+        </div>
+    </div>
+
+    <div class="chart-container">
+        <div class="chart-title">7 账号类型网络分布</div>
+        <iframe src="figures/fig_09_account_type_network.html" style="width:100%; height:840px; border:none; border-radius:8px; background:var(--bg-primary);"></iframe>
+        <div class="chart-note">
+            谁在发声，谁在传声？环形图显示普通用户与粉丝号是网络的绝对主力节点，但柱状图揭示了一个更深层的分化——粉丝号与媒体号在发出边、接收边中贡献度突出，前者负责情绪输出，后者承担信息中转。<strong>不同类型的账号，在这场传播战中扮演着截然不同的角色。</strong>
+        </div>
+    </div>
+
+    <div class="chart-container">
+        <div class="chart-title">8 源类型传播矩阵</div>
+        <iframe src="figures/fig_10_source_type_spread_matrix.html" style="width:100%; height:840px; border:none; border-radius:8px; background:var(--bg-primary);"></iframe>
+        <div class="chart-note">
+            扩散矩阵直观暴露了信息的<strong>圈层壁垒</strong>。粉丝号、普通用户是核心源微博的主要转发靶点，而法律、音乐垂类账号的扩散规模明显偏小。这说明不同叙事框架触达的受众圈层高度分化——版权争议在专业圈层悄然流动，而情绪对立的内容则经由粉丝号直抵大众，两套叙事在平行的舆论空间里各自激荡。
+        </div>
+    </div>
+
+    <div class="discovery-highlight">
+        <h4>🔍 关键洞察：多中心传播与账号分工</h4>
+        <p>这场争议没有唯一的引爆者，而是<strong>多个核心源微博并行驱动</strong>的多中心扩散。账号分工清晰得近乎残酷：粉丝号与普通用户是传播主力，把情绪和立场推送到每一个角落；媒体号则充当信息桥梁，负责事实层面的扩散。更关键的是，信息流被圈层壁垒切割——版权讨论困在专业圈层，情绪冲突却直通大众，头部节点一条微博便能点燃一片舆论场。在这场传播战中，<strong>谁能触达普通用户，谁就掌握了定义叙事的权力。</strong></p>
+    </div>
+</section>
+
+<!-- 关键词演化与叙事分析 -->
+<section id="keywords">
+    <div class="section-header">
+        <h2>关键词演化与叙事分析</h2>
+        <p class="subtitle">问题4：大家讨论的到底是什么？</p>
+    </div>
+
+    <div class="chart-container">
+        <div class="chart-title">9 高频关键词 Top 30</div>
+        <iframe src="figures/fig_11_keyword_top30.html" style="width:100%; height:840px; border:none; border-radius:8px; background:var(--bg-primary);"></iframe>
+        <div class="chart-note">
+            15.6万条微博评论，最终凝练成这张高频词榜。“双原唱”“唯一原唱”“版权”“粉丝”——这些词不是随机出现的，它们是被两套叙事反复冲刷后留下的<strong>话语化石</strong>。按语义分色后，<span style="color:#C07858;font-weight:bold;">原唱身份</span>与<span style="color:#5A7A6A;font-weight:bold;">版权创作</span>形成视觉对峙，争议的核心议题从用词那一刻就已分裂。张碧晨相关词使用<span style="color:#C07858;">赤陶色系</span>，汪苏泷相关词使用<span style="color:#5A7A6A;">松烟色系</span>，法律类词使用<span style="color:#6A8A7A;">灰绿</span>，情感类词使用<span style="color:#D4B898;">沙金</span>。
+        </div>
+    </div>
+
+    <div class="chart-container">
+        <div class="chart-title">10 叙事桑基：关键词如何流向立场</div>
+        <iframe src="figures/fig_12_narrative_sankey.html" style="width:100%; height:750px; border:none; border-radius:8px; background:var(--bg-primary);"></iframe>
+        <div class="chart-note">
+            桑基图揭示了清晰的叙事传导路径：关键词选择会将讨论引入特定的叙事框架，而框架则主导了话题的最终立场流向。<br>
+            从图中可以看到，以<span style="color:#5A7A6A;">“作词作曲”“收回授权”“著作权”</span>为代表的版权类关键词，大多进入“版权授权”“创作者身份”的叙事框架，最终主要流向<span style="color:#5A7A6A;font-weight:bold;">支持汪苏泷</span>的立场；而以<span style="color:#C07858;">“唯一原唱”“OST”“永久演唱权”</span>为代表的身份类关键词，大多进入“原唱身份”“法律解释”的叙事框架，最终主要流向<span style="color:#C07858;font-weight:bold;">支持张碧晨</span>的立场。<br>
+            同时，<span style="color:#A05050;">“粉丝”“公关”“热搜”</span>等相关词汇进入“粉丝冲突”框架后，更多流向<span style="color:#8C8C8C;">中立讨论</span>或<span style="color:#A05050;">反感饭圈</span>的立场。<strong>用语并非立场判决书，却是一张不可逆的单程票——它决定了讨论将驶入哪条叙事河道，最终汇入哪片舆论支流。</strong>
+        </div>
+    </div>
+
+    <div class="discovery-highlight">
+        <h4>🔍 关键洞察：没有人在撒谎，但也没有人在讲完整的故事</h4>
+        <p>从关键词到叙事框架，再到立场归属，桑基图呈现的不是对话，而是<strong>两套互不相通的话语体系的平行运转</strong>。“原唱”与“版权”各自构建了完整的逻辑闭环，情感记忆的话语与法律权利的话语之间不存在翻译的可能。双方都只选取了对自身有利的那部分事实，却都坚信自己掌握了全部真相——理性讨论的门槛因此被无限抬高，剩下的只有无效对峙。</p>
+        <p style="margin-top:0.8rem;">这正是<strong>“双生年轮”</strong>叙事裂痕的根源所在。</p>
+    </div>
+</section>
+
+<!-- 有趣的发现 -->
+<section id="discoveries">
+    <div class="section-header">
+        <h2>有趣的发现</h2>
+        <p class="subtitle">数据背后的反直觉现象</p>
+    </div>
+
+    <h3 class="case-title">Case1：双方不是在吵同一件事情！！！</h3>
+    <div class="narrative-intro">
+        <p>"汪苏泷粉丝聊'版权'和'授权'，张碧晨粉丝聊'原唱'和'花千骨'"</p>
+        <p>"主帖在讲版权法，评论在讲'我听了十年'——这两拨人根本没对上话。"</p>
+    </div>
+
+    <div class="chart-container">
+        <div class="chart-title">11 双阵营话题框架对比</div>
+        <img src="figures/fig_15_frame_comparison.png" alt="双阵营话题框架对比">
+    </div>
+
+    <div class="card">
+        <p>分组条形图暴露了一个令人哑然的真相：双方不是在吵同一件事。支持张碧晨阵营的讨论高度集中于「原唱身份」（30.9%）与「粉丝冲突」（41.0%）——她们在乎的是演唱记忆、影视OST的情感联结，以及饭圈对立中的阵营归属；而支持汪苏泷阵营的讨论锚定在「版权授权」（24.4%）、「创作者身份」（7.4%）与「法律解释」（7.6%）——他们在乎的是著作权归属、创作权益与法理规则。<strong>两套话语的重心几乎零交集，一条巨大的认知鸿沟横亘在争议中央。</strong></p>
+    </div>
+
+    <div class="discovery-highlight">
+        <h4>🔍 关键洞察：双方根本没在吵同一件事</h4>
+        <p>当一方在讲版权法与授权条款，另一方在回忆"我听了十年的OST"，这已经不是分歧，而是<strong>两个平行宇宙的各自运转</strong>。主帖讨论著作权归属的逻辑链条，评论区却在刷情感记忆与青春符号——没有共同的讨论基础，没有可互译的话语体系。争吵看似激烈，实则是一场隔空喊话的无效对峙。<strong>这种话题错位，正是"双生年轮"叙事分裂最赤裸的体现。</strong></p>
+    </div>
+
+    <h3 class="case-title">Case2：统一话术刷屏，年轮论战早已脱离讨论本身</h3>
+    <div class="repeated-text">
+        <p>▎ "评论区有条评论，一字不改复制粘贴了1513遍——谁干的？"</p>
+        <p style="font-weight:600; margin:1rem 0 0.3rem 0;">汪方模板（重复 1513 次）：</p>
+        <p>汪苏泷方及粉丝自始至终坚持双原唱，从未否认过张碧晨方原唱身份，作为剧方邀约的作词作曲+演唱者立项之初便为原唱，收回一切授权后也坚称双原唱；张碧晨方引导粉丝并官方宣称唯一原唱，不尊重他人劳动成果，引导粉丝挑起对立，且列举的证据均为主观上传无真实性。原创音乐人无妄之灾—支持汪苏泷</p>
+        <p style="text-align:center; color:var(--conflict); margin:0.8rem 0;">▎ ━━━ 重复 1513 次 ━━━</p>
+        <p style="font-weight:600; margin:1rem 0 0.3rem 0;">张方模板（重复 32 次）：</p>
+        <p>没关系，梦幻诛仙我只听 140w 收藏+那版，年轮只听 1400w+那版，下一秒就更不用说了—支持张碧晨</p>
+        <p style="text-align:center; color:var(--conflict); margin:0.8rem 0;">▎ ━━━ 重复 32 次 ━━━</p>
+    </div>
+
+    <div class="chart-container">
+        <div class="chart-title">12 两套叙事的高频词组对比</div>
+        <img src="figures/fig_04_camp_discourse_comparison.png" alt="两套叙事的高频词组对比">
+        <div class="chart-note">
+            <p>两套阵营，两种完全不同的表达方式。支持张碧晨的高频话术集中在情感表达——"我只听这个版本""花千骨的回忆"，重复次数有限，带着个人化的温度；支持汪苏泷的高频话术则是标准化的模板——"支持原创""版权归属明确"，单条评论一字不改被复制近1600次。<strong>一边是自发的情感倾诉，一边是有组织的模板刷屏，两套话语在表达方式上的差异，本身就是叙事割裂的缩影。</strong></p>
+        </div>
+    </div>
+
+    <div class="chart-container">
+        <div class="chart-title">13 同质化内容分布</div>
+        <img src="figures/fig_18_template_replication.png" alt="同质化内容分布">
+        <div class="chart-note">
+            <p>数据揭开了刷屏背后的操作链条。汪苏泷阵营同质化内容占比达15.5%，高于张碧晨阵营的11.6%，单条内容重复近千次的极端案例频频出现。这些批量复制的评论，发布者高度集中于粉丝号与疑似水军账号——<strong>争议后期的评论区，已经不是观点的自由市场，而是一场有组织的话术流水线。</strong></p>
+        </div>
+    </div>
+
+    <div class="discovery-highlight">
+        <h4>🔍 关键洞察：话术刷屏让论战彻底脱离讨论本身</h4>
+        <p>高频词组与同质化内容数据指向同一个残酷的事实：《年轮》争议的后期，舆论场已经从观点讨论沦为模板化话术的大规模刷屏。单条评论一字不改地复制上千次，双方用统一的"控评文案"抢占话语阵地，普通用户的理性声音被彻底淹没。</p>
+        <p style="margin-top:0.8rem;">这不是讨论，这是<strong>音量竞赛</strong>。双方不再试图沟通观点，而是通过重复话术强化己方叙事、压制对方声音。当评论区充斥着千篇一律的复制文案，原本关于歌曲本身的争议就已经死亡——剩下的，只是一场<strong>脱离事件核心的饭圈话术大战</strong>。</p>
+    </div>
+
+    <h3 class="case-title">Case3：在不同平台中，张碧晨在豆瓣中支持率成碾压式！！</h3>
+
+    <div class="chart-container">
+        <div class="chart-title">14 平台立场对比</div>
+        <iframe src="figures/fig_15_platform_comparison.html" style="width:100%; height:600px; border:none; border-radius:8px; background:var(--bg-primary);"></iframe>
+        <div class="chart-note">
+            <p>同一首歌，五个平台，五套截然不同的舆论气候。堆叠柱状图显示：B站支持汪苏泷的比例高达80.6%，豆瓣支持张碧晨的比例达59.1%——两个极端，彼此遥望。微博被反感饭圈的声音主导，抖音与知乎则以中立讨论为主。<strong>这不是同一场争议的不同侧面，而是同一首歌在不同世界里引发的五场独立战争。</strong></p>
+        </div>
+    </div>
+
+    <div class="chart-container">
+        <div class="chart-title">15 豆瓣张碧晨的支持率分析</div>
+        <img src="figures/fig_16_douban_why.png" alt="豆瓣张碧晨的支持率分析">
+        <div class="chart-note">
+            <p>豆瓣59.1%支持张碧晨，背后是平台基因的必然。豆瓣女性用户占六成以上，讨论氛围天然更倾向于情感共情与身份认同——"唱了十年的OST被收回"，这种叙事在豆瓣比版权法条更容易获得共鸣。再加上部分用户对男性创作者的天然警惕，同为女性的张碧晨更容易被视作"自己人"。<strong>不是豆瓣选了张碧晨，是豆瓣的用户结构和话语传统替她选了。</strong></p>
+        </div>
+    </div>
+
+    <div class="narrative-intro">
+        <p>"豆瓣 59.1% 支持张碧晨，B站 80.6% 支持汪苏泷——同一首歌，两个世界。"</p>
+        <p>"在豆瓣发一条'支持汪苏泷'会怎样？——8%的人试过。"</p>
+        <p>"为什么豆瓣用户对这件事最生气？——因为她们觉得这不是版权问题，是欺负人。"</p>
+        <p>"知乎讲法律，豆瓣讲感情，B站讲原创——平台决定了'谁是对的'？"</p>
+        <p>"踩组扒了十年证据，知乎列了十条法条——谁赢了？答案是：谁都没赢，但各赢各的平台。"</p>
+        <p>"如果把豆瓣评论区搬到B站，会发生什么？——那可能是中文互联网最精彩的打架。"</p>
+    </div>
+    
+    <div class="discovery-highlight">
+        <h4>🔍 关键洞察：平台生态决定了"谁是对的"</h4>
+        <p>从平台对比数据可以清晰看到，同一首《年轮》的争议，在不同平台分裂成了完全独立的舆论场：B站用户站在创作者视角，将版权与原创权益视为不容侵犯的底线；豆瓣用户更偏向情感叙事与身份认同，"唱了十年的OST，凭什么不让唱"成为主流逻辑；知乎聚焦法律条文与事实考据；微博则被饭圈对立情绪全面渗透。</p>
+        <p style="margin-top:0.8rem;">用户画像与平台话语生态的双重作用，让每个平台都形成了自洽的"局部真相"。在豆瓣，59%的支持率不是偏袒，而是用户构成与叙事框架自然推导出的结果；在B站，80.6%的共识同样如此。跨平台的舆论割裂意味着，这场争议不存在统一的"胜负"——<strong>只有不同平台里各自闭环的叙事世界，和各自认定的"正义"。</strong></p>
+    </div>
+</section>
+
+<!-- 总结 -->
+<section id="conclusion">
+    <div class="section-header">
+        <h2>总结</h2>
+        <p class="subtitle">从「一首歌」到「两个年轮」</p>
+    </div>
+
+    <div class="conclusion-box">
+        <h3>从「一首歌」到「两个年轮」</h3>
+        <p>《年轮》的出圈，离不开汪苏泷的创作和张碧晨的演唱。但当版权争议爆发，双方粉丝各自拿起不同的叙事武器——一边谈创作者权益，一边谈演唱者记忆——这首歌就在舆论场里裂成了两个版本。十年后，人们听到的早已不是同一首《年轮》。</p>
+        <br>
+        <p>这就是"双生年轮"的真正含义。</p>
+        <p style="font-size: 1.2rem; font-weight: 600; text-align: center; margin-top: 1.5rem;">
+            "双生年轮"——同根而生，裂纹而分，平台为壤，记忆成纹。
+        </p>
+    </div>
+
+    <div class="chart-container" style="margin-top:2rem;">
+        <img src="figures/fig_17_dual_birth.png" alt="双生年轮总结图" style="max-width:100%; height:auto; border-radius:8px;">
+    </div>
+</section>
+
+</div>
+
+<footer>
+    <p>《双生年轮》数据可视化项目 · 基于微博及多平台文本数据的传播分析</p>
+    <p style="margin-top: 0.5rem; font-size: 0.8rem;">配色方案：赤陶松烟 | 数据集：爬虫获得</p>
+</footer>
+
+</body>
+</html>

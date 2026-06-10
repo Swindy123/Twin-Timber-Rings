@@ -1,0 +1,60 @@
+标签怎么填
+stance 立场
+只能从这几个里选：
+support_zhang
+support_wang
+neutral
+anti_fanwar
+unclear
+含义：
+标签	含义
+support_zhang	支持张碧晨
+support_wang	支持汪苏泷
+neutral	中立解释
+anti_fanwar	反感饭圈争议
+unclear	看不出来
+________________________________________
+frame 叙事框架
+只能从这些里选：
+original_singer
+copyright_authorization
+creator_identity
+memory_emotion
+legal_discussion
+fan_conflict
+platform_meta
+unclear
+含义：
+标签	含义
+original_singer	原唱身份
+copyright_authorization	版权 / 授权
+creator_identity	创作者身份
+memory_emotion	回忆 / 遗憾
+legal_discussion	法律解释
+fan_conflict	粉丝冲突
+platform_meta	营销号 / 平台 / 热搜讨论
+unclear	看不出来
+________________________________________
+emotion 情绪
+angry
+sad
+mocking
+supportive
+neutral
+confused
+unclear
+________________________________________
+event_stage 事件阶段
+建议这样分：
+pre_event
+outbreak
+response
+debate
+cooldown
+可以按时间粗分：
+阶段	时间	含义
+pre_event	2025-07-21及以前	爆发前
+outbreak	2025-07-22 到 2025-07-24	争议发酵
+response	2025-07-25 到 2025-07-26	双方回应 / 热搜爆发
+debate	2025-07-27 到 2025-07-31	版权、原唱、立场争论
+cooldown	2025-08-01以后	冷却期 / 总结期

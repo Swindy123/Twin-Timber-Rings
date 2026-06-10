@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>图 09 账号类型网络：节点构成与边贡献</title>
+  <style>
+    :root {
+      --bg: #F5F3EE;
+      --panel: #FFFDF8;
+      --text: #2B2926;
+      --muted: #666666;
+      --grid: #D7CFC4;
+      --accent: #C07858;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Microsoft YaHei", "Noto Sans CJK SC", Arial, sans-serif;
+    }
+    main { max-width: 1180px; margin: 0 auto; padding: 24px; }
+    header { display: flex; justify-content: space-between; gap: 16px; align-items: end; margin-bottom: 16px; }
+    h1 { margin: 0 0 8px; font-size: 24px; line-height: 1.25; letter-spacing: 0; }
+    .subtitle { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.7; }
+    .toolbar { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
+    button {
+      border: 1px solid #cfc7bd;
+      background: #fffdf8;
+      color: var(--text);
+      border-radius: 6px;
+      padding: 7px 10px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    button.active, button:hover { border-color: var(--accent); color: #7a422e; }
+    .chart-wrap {
+      position: relative;
+      background: rgba(255, 253, 248, 0.62);
+      border: 1px solid #ded7ce;
+      border-radius: 8px;
+      padding: 14px;
+      min-height: 560px;
+    }
+    svg { width: 100%; height: 620px; display: block; overflow: visible; }
+    .axis text, .legend text { fill: var(--text); font-size: 12px; }
+    .grid-line { stroke: var(--grid); stroke-dasharray: 4 4; stroke-width: 1; opacity: .72; }
+    .axis-line { stroke: #bdb4aa; stroke-width: 1; }
+    .mark { cursor: pointer; transition: opacity .16s ease, transform .16s ease, filter .16s ease; }
+    .mark.dimmed { opacity: .16; }
+    .mark:hover { opacity: 1; filter: drop-shadow(0 4px 7px rgba(43, 41, 38, .16)); }
+    .label { fill: var(--text); font-size: 12px; paint-order: stroke; stroke: var(--bg); stroke-width: 3px; }
+    .cell-number { fill: #2B2926; font-size: 12px; font-weight: 600; stroke: none; paint-order: normal; pointer-events: none; }
+    #tooltip {
+      position: fixed;
+      pointer-events: none;
+      z-index: 10;
+      max-width: 320px;
+      padding: 10px 12px;
+      border: 1px solid #cfc7bd;
+      border-radius: 6px;
+      background: rgba(255, 253, 248, .96);
+      box-shadow: 0 10px 24px rgba(43, 41, 38, .16);
+      color: var(--text);
+      font-size: 12px;
+      line-height: 1.55;
+      display: none;
+    }
+    #detail {
+      margin-top: 12px;
+      min-height: 44px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+    @media (max-width: 720px) {
+      main { padding: 14px; }
+      header { display: block; }
+      .toolbar { justify-content: flex-start; margin-top: 10px; }
+      .chart-wrap { min-height: 520px; padding: 8px; }
+      svg { height: 560px; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <div>
+        <h1>图 09 账号类型网络：节点构成与边贡献</h1>
+        <p class="subtitle">左侧为账号类型节点占比，右侧为发出边与接收边堆叠。</p>
+      </div>
+      <div class="toolbar" id="toolbar"></div>
+    </header>
+    <section class="chart-wrap">
+      <svg id="chart" viewBox="0 0 1080 620" role="img"></svg>
+      <div id="tooltip"></div>
+    </section>
+    <div id="detail">Hover for details. Click an item to pin it here.</div>
+  </main>
+  <script>
+
+const rows = [{"key": "ordinary_user", "label": "普通用户", "nodes": 1866, "out": 1351, "in": 2119, "color": "#9A8A7A"}, {"key": "fan_account", "label": "粉丝号", "nodes": 932, "out": 1127, "in": 1389, "color": "#C07858"}, {"key": "legal_account", "label": "法律相关号", "nodes": 92, "out": 14, "in": 125, "color": "#6F7F9D"}, {"key": "music_account", "label": "音乐相关号", "nodes": 87, "out": 121, "in": 112, "color": "#5A7A6A"}, {"key": "media", "label": "媒体号", "nodes": 41, "out": 1038, "in": 34, "color": "#8C8C8C"}, {"key": "marketing_account", "label": "营销号", "nodes": 16, "out": 150, "in": 22, "color": "#A05050"}];
+const svg = document.getElementById("chart"), tooltip = document.getElementById("tooltip"), detail = document.getElementById("detail");
+const W = 1080, H = 620, cx = 245, cy = 275, r = 160, inner = 92;
+function el(name, attrs, parent = svg) { const node = document.createElementNS("http://www.w3.org/2000/svg", name); Object.entries(attrs).forEach(([k,v]) => node.setAttribute(k,v)); parent.appendChild(node); return node; }
+function polar(a, radius) { return [cx + Math.cos(a) * radius, cy + Math.sin(a) * radius]; }
+let activeKind = "全部";
+function arc(start, end, color, d) {
+  const [x1,y1]=polar(start,r), [x2,y2]=polar(end,r), [x3,y3]=polar(end,inner), [x4,y4]=polar(start,inner);
+  const large = end-start > Math.PI ? 1 : 0;
+  const p = `M ${x1} ${y1} A ${r} ${r} 0 ${large} 1 ${x2} ${y2} L ${x3} ${y3} A ${inner} ${inner} 0 ${large} 0 ${x4} ${y4} Z`;
+  const node = el("path", {d:p, fill:color, stroke:"white", "stroke-width":1.2, class:"mark", "data-kind":d.label});
+  const mid = (start + end) / 2;
+  const dx = Math.cos(mid) * 7;
+  const dy = Math.sin(mid) * 7;
+  node.addEventListener("mousemove", e => { tooltip.innerHTML=tip(d); tooltip.style.display="block"; tooltip.style.left=e.clientX+14+"px"; tooltip.style.top=e.clientY+14+"px"; });
+  node.addEventListener("mouseenter",()=>{ node.style.transform = `translate(${dx}px, ${dy}px)`; });
+  node.addEventListener("mouseleave",()=>{ tooltip.style.display="none"; node.style.transform = ""; });
+  node.addEventListener("click",()=>toggleKind(d.label, tip(d)));
+}
+function tip(d) { return `<b>${d.label}</b><br>节点：${d.nodes}<br>发出边：${d.out}<br>接收边：${d.in}`; }
+function selectKind(kind, html) {
+  activeKind = kind;
+  document.querySelectorAll("button").forEach(x => x.classList.toggle("active", x.textContent === kind));
+  document.querySelectorAll(".mark").forEach(x => {
+    const hit = x.dataset.kind === kind;
+    x.classList.toggle("dimmed", !hit);
+  });
+  detail.innerHTML = html;
+}
+function toggleKind(kind, html) {
+  if (activeKind === kind) {
+    clearSelection();
+  } else {
+    selectKind(kind, html);
+  }
+}
+function clearSelection() {
+  activeKind = "全部";
+  document.querySelectorAll("button").forEach(x => x.classList.toggle("active", x.textContent === "全部"));
+  document.querySelectorAll(".mark").forEach(x => {
+    x.classList.remove("dimmed");
+  });
+}
+const total = rows.reduce((s,d)=>s+d.nodes,0) || 1;
+let a = -Math.PI/2;
+rows.forEach(d => { const next = a + d.nodes / total * Math.PI * 2; arc(a, next, d.color, d); a = next; });
+el("text", {x:cx, y:cy-4, "text-anchor":"middle", class:"label", "font-size":24}).textContent = total;
+el("text", {x:cx, y:cy+22, "text-anchor":"middle", class:"label"}).textContent = "节点";
+const barX = 610, barW = 96, gap = 126, base = 500, maxTotal = Math.max(1, rows.reduce((s,d)=>s+d.out,0), rows.reduce((s,d)=>s+d.in,0));
+["发出边", "接收边"].forEach((name, idx) => el("text", {x:barX+idx*gap+barW/2, y:base+28, "text-anchor":"middle", class:"label"}).textContent=name);
+["out", "in"].forEach((field, idx) => {
+  let y = base;
+  rows.forEach(d => {
+    const h = d[field] / maxTotal * 360;
+    y -= h;
+    const rect = el("rect", {x:barX+idx*gap, y, width:barW, height:h, fill:d.color, class:"mark", "data-kind":d.label});
+    rect.addEventListener("mousemove", e => { tooltip.innerHTML=tip(d); tooltip.style.display="block"; tooltip.style.left=e.clientX+14+"px"; tooltip.style.top=e.clientY+14+"px"; });
+    rect.addEventListener("mouseenter",()=>{ rect.setAttribute("x", barX+idx*gap-4); rect.setAttribute("width", barW+8); });
+    rect.addEventListener("mouseleave",()=>{ tooltip.style.display="none"; rect.setAttribute("x", barX+idx*gap); rect.setAttribute("width", barW); });
+    rect.addEventListener("click",()=>toggleKind(d.label, tip(d)));
+  });
+});
+rows.forEach((d, i) => {
+  const y = 110 + i * 28;
+  const item = el("rect", {x:880, y:y-12, width:14, height:14, fill:d.color, class:"mark", "data-kind":d.label});
+  item.addEventListener("click",()=>toggleKind(d.label, tip(d)));
+  el("text", {x:902, y, class:"label"}).textContent = `${d.label}  节点 ${d.nodes}`;
+});
+const toolbar = document.getElementById("toolbar");
+["全部", ...rows.map(d=>d.label)].forEach(k => { const b=document.createElement("button"); b.textContent=k; b.onclick=()=>{ if (k==="全部") { clearSelection(); return; } const d = rows.find(x => x.label === k); toggleKind(k, tip(d)); }; toolbar.appendChild(b); });
+toolbar.firstChild.classList.add("active");
+
+  </script>
+</body>
+</html>

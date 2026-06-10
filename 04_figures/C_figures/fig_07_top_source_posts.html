@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>图 07 核心源微博：传播规模与互动量</title>
+  <style>
+    :root {
+      --bg: #F5F3EE;
+      --panel: #FFFDF8;
+      --text: #2B2926;
+      --muted: #666666;
+      --grid: #D7CFC4;
+      --accent: #C07858;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Microsoft YaHei", "Noto Sans CJK SC", Arial, sans-serif;
+    }
+    main { max-width: 1180px; margin: 0 auto; padding: 24px; }
+    header { display: flex; justify-content: space-between; gap: 16px; align-items: end; margin-bottom: 16px; }
+    h1 { margin: 0 0 8px; font-size: 24px; line-height: 1.25; letter-spacing: 0; }
+    .subtitle { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.7; }
+    .toolbar { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
+    button {
+      border: 1px solid #cfc7bd;
+      background: #fffdf8;
+      color: var(--text);
+      border-radius: 6px;
+      padding: 7px 10px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    button.active, button:hover { border-color: var(--accent); color: #7a422e; }
+    .chart-wrap {
+      position: relative;
+      background: rgba(255, 253, 248, 0.62);
+      border: 1px solid #ded7ce;
+      border-radius: 8px;
+      padding: 14px;
+      min-height: 560px;
+    }
+    svg { width: 100%; height: 620px; display: block; overflow: visible; }
+    .axis text, .legend text { fill: var(--text); font-size: 12px; }
+    .grid-line { stroke: var(--grid); stroke-dasharray: 4 4; stroke-width: 1; opacity: .72; }
+    .axis-line { stroke: #bdb4aa; stroke-width: 1; }
+    .mark { cursor: pointer; transition: opacity .16s ease, transform .16s ease, filter .16s ease; }
+    .mark.dimmed { opacity: .16; }
+    .mark:hover { opacity: 1; filter: drop-shadow(0 4px 7px rgba(43, 41, 38, .16)); }
+    .label { fill: var(--text); font-size: 12px; paint-order: stroke; stroke: var(--bg); stroke-width: 3px; }
+    .cell-number { fill: #2B2926; font-size: 12px; font-weight: 600; stroke: none; paint-order: normal; pointer-events: none; }
+    #tooltip {
+      position: fixed;
+      pointer-events: none;
+      z-index: 10;
+      max-width: 320px;
+      padding: 10px 12px;
+      border: 1px solid #cfc7bd;
+      border-radius: 6px;
+      background: rgba(255, 253, 248, .96);
+      box-shadow: 0 10px 24px rgba(43, 41, 38, .16);
+      color: var(--text);
+      font-size: 12px;
+      line-height: 1.55;
+      display: none;
+    }
+    #detail {
+      margin-top: 12px;
+      min-height: 44px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+    @media (max-width: 720px) {
+      main { padding: 14px; }
+      header { display: block; }
+      .toolbar { justify-content: flex-start; margin-top: 10px; }
+      .chart-wrap { min-height: 520px; padding: 8px; }
+      svg { height: 560px; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <div>
+        <h1>图 07 核心源微博：传播规模与互动量</h1>
+        <p class="subtitle">气泡大小表示涉及节点数，颜色表示叙事类型。</p>
+      </div>
+      <div class="toolbar" id="toolbar"></div>
+    </header>
+    <section class="chart-wrap">
+      <svg id="chart" viewBox="0 0 1080 620" role="img"></svg>
+      <div id="tooltip"></div>
+    </section>
+    <div id="detail">Hover for details. Click an item to pin it here.</div>
+  </main>
+  <script>
+
+const rows = [{"name": "王纯迅有想法", "x": 90, "y": 7716, "size": 90, "narrative": "版权法律讨论", "color": "#6F7F9D", "text": "#年轮被指抄袭蝶恋# 咱不说整首歌的差异有多大，也不说离法律规定的抄袭差的十万八千里，就说主歌那两句相似旋律也还存在好几处不同的旋律走向，我就说一点，如果就这被定义为抄袭，那你是不"}, {"name": "洛洛洛洛铭洛洛_", "x": 90, "y": 2386, "size": 82, "narrative": "混合/中立传播", "color": "#9A8A7A", "text": " 张碧晨超话 #张碧晨# #年轮# #张碧晨获亚洲最佳女歌手# #张碧晨爱的史诗交响演唱会# #张碧晨真跳加绒摇了# #张碧晨开往早晨的午夜# 鬼知道我每次发完视频后收到一堆一模"}, {"name": "校草收纳箱", "x": 89, "y": 4610, "size": 90, "narrative": "张碧晨/原唱叙事", "color": "#C07858", "text": "#网易云称取消原唱标是系统展示问题# 网友今日发现网易云音乐平台突然取消张碧晨《年轮》《梦幻诛仙》《下一秒》三首歌的“原唱”标识，仅保留“演唱者”字段，话题 #网易云取消张碧晨三首"}, {"name": "君君的旅行日记", "x": 88, "y": 65897, "size": 85, "narrative": "混合/中立传播", "color": "#9A8A7A", "text": "没收张碧晨的钱，为什么抓着这个事情不放。因为我觉得她没错，但被各种花式上热搜围剿，看不下去了。 既然有人说我偏袒，那我用事实说话，请看下面的图。 《年轮》这首歌，主流市场有三个版本"}, {"name": "新浪娱乐", "x": 87, "y": 468262, "size": 87, "narrative": "版权法律讨论", "color": "#6F7F9D", "text": "#张碧晨方称享有年轮永久演唱权利# #张碧晨不再演唱年轮# ​​​25日， @张碧晨 工作室就《年轮》歌曲引发的舆论争议作出回应，表示经查阅正式合约，张碧晨依法享有该歌曲在全球范围"}, {"name": "何牧歌耶", "x": 87, "y": 22580, "size": 88, "narrative": "版权法律讨论", "color": "#6F7F9D", "text": "看到 #张碧晨方称享有年轮永久演唱权利# 的热搜，我的感觉……这是非常迷惑的一句话。 先声明：不听张碧晨更不听汪苏泷，以下是纯粹就事论事的分析。 好开始。 首先，必须得提醒吃瓜的各"}, {"name": "娱乐扒皮", "x": 86, "y": 392284, "size": 44, "narrative": "混合/中立传播", "color": "#9A8A7A", "text": "#张碧晨告别年轮# 张碧晨值此《年轮》发行十周年之际，好好和这首作品告个别。 ​​​"}, {"name": "君君的旅行日记", "x": 86, "y": 22777, "size": 85, "narrative": "张碧晨/原唱叙事", "color": "#C07858", "text": "我觉得张碧晨挺倒霉的吧，来看看正确的时间线。 2021年，一个叫旺仔小乔的网红说《年轮》这首歌只认张碧晨一个原唱。图1 这个言论最近被翻出来，本来是网红引得风波，粉丝打架，结果汪苏"}, {"name": "新浪娱乐", "x": 85, "y": 46549, "size": 84, "narrative": "张碧晨/原唱叙事", "color": "#C07858", "text": "#张碧晨汪苏泷年轮合约存在信息差# #律师说原唱不是法律概念是宣传用词# 新浪娱乐 @娱理 工作室解读 @张碧晨 @汪苏泷 《年轮》原唱争议，分别咨询了三位权威版权律师，得出以下结"}, {"name": "张碧晨Studio", "x": 84, "y": 723252, "size": 81, "narrative": "张碧晨/原唱叙事", "color": "#C07858", "text": " 张碧晨超话 近日，网络上关于歌曲《年轮》的相关言论引发了不必要的争议与误解。为正视听，也为维护张碧晨女士作为该作品唯一原唱的合法权益，我们郑重说明如下： ​"}, {"name": "梨视频", "x": 84, "y": 278242, "size": 84, "narrative": "张碧晨/原唱叙事", "color": "#C07858", "text": "【 #张碧晨方回应年轮原唱# 】7月25日凌晨， @张碧晨Studio 发文：“近日，网络上关于歌曲《年轮》的相关言论引发了不必要的争议与误解。为正视听，也为维护张碧晨女士作为该作"}, {"name": "现代快报", "x": 84, "y": 85555, "size": 81, "narrative": "张碧晨/原唱叙事", "color": "#C07858", "text": "【 #张碧晨方列出年轮关键事件时间线# 】7月25日， @张碧晨Studio 发声明回应，称张碧晨是《年轮》的唯一原唱，并晒出《年轮》关键事件时间线；而《梦幻诛仙》，歌曲从立项之初"}, {"name": "打工小狗天天摸鱼版", "x": 84, "y": 58422, "size": 82, "narrative": "张碧晨/原唱叙事", "color": "#C07858", "text": "#旺仔小乔是张碧晨最大的黑粉吧# 张碧晨广州站演唱会开票遇冷，直播间售票遭网友刷屏干扰，。此前因“旺仔小乔”言论引发《年轮》原唱争议。张碧晨曾称和汪苏泷关系非常好，曾说过“《年轮》"}, {"name": "COUM_童禹坤童话镇", "x": 84, "y": 1151, "size": 81, "narrative": "混合/中立传播", "color": "#9A8A7A", "text": " 童禹坤超话 🎉 #童禹坤 七载破尘樊 今朝振羽翔# 七载长路 泠泠澈澈穿透时光之幕 晚风抚过 发歌纳 高音似云间曦光穿刺层雾低吟 七载流转 翼起然声线清泉渐汇成海 可映照万象星"}, {"name": "饭圈天真妹", "x": 83, "y": 187043, "size": 77, "narrative": "汪苏泷/版权叙事", "color": "#5A7A6A", "text": "年轮、下一秒、梦幻诛仙都是由汪苏泷作词作曲的 一首成功的歌曲离不了所有的创作者 #张碧晨有三首歌都是汪苏泷作词作曲# ​"}, {"name": "明星娱乐新闻", "x": 83, "y": 52978, "size": 82, "narrative": "版权法律讨论", "color": "#6F7F9D", "text": "#张碧晨年轮海外版权受限# 张碧晨版《年轮》在某音乐软件的海外区域的版权受限，变灰了，有网友解释是有bug，到底怎么回事啊 ​"}, {"name": "MIT_短腿涵", "x": 83, "y": 7207, "size": 79, "narrative": "版权法律讨论", "color": "#6F7F9D", "text": "《年轮》舆论战：不是原唱之争，而是控制与抹除 围绕《年轮》的原唱争议持续延烧，与其说是音乐合作的分歧，更像是一场精准设计的舆论与授权操控行动。事件演变至今，部分舆论方几乎以「日更造"}, {"name": "Diamond_呆晨", "x": 83, "y": 4129, "size": 84, "narrative": "混合/中立传播", "color": "#9A8A7A", "text": "2017年《凉凉》爆火，各种不同版本的翻唱都能登上热搜，不论是评论区还是每次活动现场，大家都在喊她唱《凉凉》，但她一次都没唱过，因为她认为，在未曾与杨宗纬老师公开合唱之前，她不应该"}, {"name": "蚊子下鸡蛋", "x": 83, "y": 3268, "size": 83, "narrative": "混合/中立传播", "color": "#9A8A7A", "text": "不占理的打不过就开始耍无赖 为什么上升到男女性别对立？ 为什么上升到纯vocal和创作歌手对立？ 这件事情和「性别」以及「歌手赛道」到底有什么关系？ 因为： 〖有且只有这一首歌有争"}, {"name": "钱江晚报", "x": 82, "y": 219930, "size": 81, "narrative": "混合/中立传播", "color": "#9A8A7A", "text": "#年轮纠纷撕裂了谁的体面# 旺仔小乔的一句“我认定的事不会改”，成功让《年轮》从KTV金曲沦为“法考真题”。这位网红的惊天一锤，砸出了音乐圈十年难遇的割席场景：两个原唱在热搜上互相"}];
+const svg = document.getElementById("chart");
+const tooltip = document.getElementById("tooltip");
+const detail = document.getElementById("detail");
+const W = 1080, H = 620, m = {l: 86, r: 34, t: 34, b: 74};
+const maxX = Math.max(1, ...rows.map(d => d.x));
+const maxY = Math.max(1, ...rows.map(d => d.y));
+const maxSize = Math.max(1, ...rows.map(d => d.size));
+const sx = x => m.l + x / maxX * (W - m.l - m.r);
+const sy = y => H - m.b - y / maxY * (H - m.t - m.b);
+const sr = s => 9 + Math.sqrt(s / maxSize) * 28;
+function el(name, attrs, parent = svg) {
+  const node = document.createElementNS("http://www.w3.org/2000/svg", name);
+  Object.entries(attrs).forEach(([k, v]) => node.setAttribute(k, v));
+  parent.appendChild(node);
+  return node;
+}
+function fmt(n) { return Number(n || 0).toLocaleString("zh-CN"); }
+function tip(d) {
+  return `<b>${d.name}</b><br>采集转发边：${fmt(d.x)}<br>转评赞总量：${fmt(d.y)}<br>涉及节点：${fmt(d.size)}<br>叙事：${d.narrative}`;
+}
+for (let i = 0; i <= 5; i++) {
+  const x = m.l + i * (W - m.l - m.r) / 5;
+  const y = H - m.b - i * (H - m.t - m.b) / 5;
+  el("line", {x1: x, y1: m.t, x2: x, y2: H - m.b, class: "grid-line"});
+  el("line", {x1: m.l, y1: y, x2: W - m.r, y2: y, class: "grid-line"});
+  el("text", {x, y: H - m.b + 24, "text-anchor": "middle", class: "label"}).textContent = fmt(maxX * i / 5);
+  el("text", {x: m.l - 12, y: y + 4, "text-anchor": "end", class: "label"}).textContent = fmt(maxY * i / 5);
+}
+el("line", {x1: m.l, y1: H - m.b, x2: W - m.r, y2: H - m.b, class: "axis-line"});
+el("line", {x1: m.l, y1: m.t, x2: m.l, y2: H - m.b, class: "axis-line"});
+el("text", {x: W / 2, y: H - 24, "text-anchor": "middle", class: "label"}).textContent = "采集转发边数";
+el("text", {x: 18, y: H / 2, transform: `rotate(-90 18 ${H / 2})`, "text-anchor": "middle", class: "label"}).textContent = "转评赞互动总量";
+rows.forEach((d, i) => {
+  const c = el("circle", {cx: sx(d.x), cy: sy(d.y), r: sr(d.size), fill: d.color, stroke: "white", "stroke-width": 1.4, opacity: .86, class: "mark", "data-kind": d.narrative});
+  c.addEventListener("mousemove", e => { tooltip.innerHTML = tip(d); tooltip.style.display = "block"; tooltip.style.left = e.clientX + 14 + "px"; tooltip.style.top = e.clientY + 14 + "px"; });
+  c.addEventListener("mouseleave", () => tooltip.style.display = "none");
+  c.addEventListener("click", () => detail.innerHTML = tip(d) + (d.text ? `<br>文本：${d.text}` : ""));
+  if (i < 8) el("text", {x: sx(d.x) + sr(d.size) + 4, y: sy(d.y) + 4, class: "label"}).textContent = d.name.slice(0, 12);
+});
+const kinds = [...new Set(rows.map(d => d.narrative))];
+const toolbar = document.getElementById("toolbar");
+["全部", ...kinds].forEach(k => {
+  const b = document.createElement("button");
+  b.textContent = k;
+  b.onclick = () => {
+    document.querySelectorAll("button").forEach(x => x.classList.remove("active"));
+    b.classList.add("active");
+    document.querySelectorAll(".mark").forEach(x => x.classList.toggle("dimmed", k !== "全部" && x.dataset.kind !== k));
+  };
+  toolbar.appendChild(b);
+});
+toolbar.firstChild.classList.add("active");
+
+  </script>
+</body>
+</html>

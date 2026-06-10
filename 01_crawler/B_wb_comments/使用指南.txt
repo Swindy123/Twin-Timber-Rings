@@ -1,0 +1,90 @@
+微博爬虫快速启动指南
+=========================
+
+📋 前置要求：
+  • 已登录微博账号的浏览器（Chrome/Edge/Firefox）
+  • Python 3.9+
+  • 已安装依赖包
+
+🚀 快速开始（3步）：
+
+第1步：获取 Cookie
+────────────────────
+
+1. 打开浏览器，访问 https://weibo.com （确保已登录）
+
+2. 按 F12 打开开发者工具
+
+3. 点击 "Application" 标签（如果看不到，点击 >> 符号展开更多标签）
+
+4. 左侧菜单找到 "Cookies" -> 展开 -> 点击 "weibo.com"
+
+5. 在右侧表格中找到 "SUB" 这一行
+
+   表格列：Name | Value | Domain | Path | ...
+           SUB  | (很长的字符串) | ...
+
+6. 复制 Value 列的内容（整个长字符串，不要"SUB="前缀）
+
+   示例：_2A25JgRm-DeRhGedF41sTy7XJwj-IHXVqXVOmrDV8PUNbmtAZLVPUkW1NRm0WR2KQSjvPMOhzBGDHfkJ-4ScvgP1w
+
+
+第2步：更新脚本配置
+────────────────────
+
+打开 weibo_crawler.py，找到这几行（第17-18行）：
+
+    COOKIES = {
+        'SUB': '这里粘贴你的SUB值',
+    }
+
+把你复制的 SUB 值粘贴进去，保存文件。
+
+
+第3步：运行爬虫
+────────────────────
+
+打开 PowerShell，运行：
+
+    D:/cv/python.exe "d:\1ZJUSstudy\study_3_down\数据可视化\Homework3\weibo_crawler.py"
+
+稍等片刻，爬虫会开始采集评论。完成后会生成 weibo_comments_raw.csv 文件。
+
+
+⚠️  常见问题：
+
+Q: 运行时显示 "❌ API返回异常"？
+A: SUB Cookie 可能已过期。需要重新登录微博、获取新的 SUB 值。
+
+Q: 如何找到目标微博的 ID (mid)？
+A: 
+   - 打开微博
+   - 看 URL 栏，例如：https://weibo.com/1234567890/5192118454714744
+   - mid = 最后一个数字，即 5192118454714744
+
+Q: 要采集多个微博的评论怎么办？
+A: 编辑 weibo_crawler.py 的 TARGET_POSTS 列表，添加多条微博
+
+   TARGET_POSTS = [
+       ('5192118454714744', '微博标题1', 'https://weibo.com/.../5192118454714744'),
+       ('5199999999999999', '微博标题2', 'https://weibo.com/.../5199999999999999'),
+   ]
+
+
+📊 输出 CSV 字段说明：
+
+| 字段 | 说明 | 示例 |
+|------|------|------|
+| platform | 平台 | weibo |
+| data_type | 数据类型 | comment |
+| keyword | 来源帖（便于分类） | 张碧晨工作室声明评论 |
+| author | 评论者昵称 | 用户名 |
+| author_type | 用户类型 | user / big_v / verified_user |
+| time | 发表时间 | 2024-05-29 12:34:56 |
+| stage | 阶段标记（可空） | 初筛 / 二审 |
+| text | 评论内容 | 评论正文 |
+| like_count | 点赞数 | 12 |
+| comment_count | 评论的评论数 | 0 |
+| repost_count | 转发数 | 空 |
+| url | 源微博链接 | https://weibo.com/... |
+| collector | 采集者 | 数据爬虫 |

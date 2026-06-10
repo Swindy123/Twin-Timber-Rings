@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>图 10 传播结构：核心源微博与账号类型扩散矩阵</title>
+  <style>
+    :root {
+      --bg: #F5F3EE;
+      --panel: #FFFDF8;
+      --text: #2B2926;
+      --muted: #666666;
+      --grid: #D7CFC4;
+      --accent: #C07858;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Microsoft YaHei", "Noto Sans CJK SC", Arial, sans-serif;
+    }
+    main { max-width: 1180px; margin: 0 auto; padding: 24px; }
+    header { display: flex; justify-content: space-between; gap: 16px; align-items: end; margin-bottom: 16px; }
+    h1 { margin: 0 0 8px; font-size: 24px; line-height: 1.25; letter-spacing: 0; }
+    .subtitle { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.7; }
+    .toolbar { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
+    button {
+      border: 1px solid #cfc7bd;
+      background: #fffdf8;
+      color: var(--text);
+      border-radius: 6px;
+      padding: 7px 10px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    button.active, button:hover { border-color: var(--accent); color: #7a422e; }
+    .chart-wrap {
+      position: relative;
+      background: rgba(255, 253, 248, 0.62);
+      border: 1px solid #ded7ce;
+      border-radius: 8px;
+      padding: 14px;
+      min-height: 560px;
+    }
+    svg { width: 100%; height: 620px; display: block; overflow: visible; }
+    .axis text, .legend text { fill: var(--text); font-size: 12px; }
+    .grid-line { stroke: var(--grid); stroke-dasharray: 4 4; stroke-width: 1; opacity: .72; }
+    .axis-line { stroke: #bdb4aa; stroke-width: 1; }
+    .mark { cursor: pointer; transition: opacity .16s ease, transform .16s ease, filter .16s ease; }
+    .mark.dimmed { opacity: .16; }
+    .mark:hover { opacity: 1; filter: drop-shadow(0 4px 7px rgba(43, 41, 38, .16)); }
+    .label { fill: var(--text); font-size: 12px; paint-order: stroke; stroke: var(--bg); stroke-width: 3px; }
+    .cell-number { fill: #2B2926; font-size: 12px; font-weight: 600; stroke: none; paint-order: normal; pointer-events: none; }
+    #tooltip {
+      position: fixed;
+      pointer-events: none;
+      z-index: 10;
+      max-width: 320px;
+      padding: 10px 12px;
+      border: 1px solid #cfc7bd;
+      border-radius: 6px;
+      background: rgba(255, 253, 248, .96);
+      box-shadow: 0 10px 24px rgba(43, 41, 38, .16);
+      color: var(--text);
+      font-size: 12px;
+      line-height: 1.55;
+      display: none;
+    }
+    #detail {
+      margin-top: 12px;
+      min-height: 44px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+    @media (max-width: 720px) {
+      main { padding: 14px; }
+      header { display: block; }
+      .toolbar { justify-content: flex-start; margin-top: 10px; }
+      .chart-wrap { min-height: 520px; padding: 8px; }
+      svg { height: 560px; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <div>
+        <h1>图 10 传播结构：核心源微博与账号类型扩散矩阵</h1>
+        <p class="subtitle">颜色越深表示该核心源微博流向对应账号类型的转发边越多。</p>
+      </div>
+      <div class="toolbar" id="toolbar"></div>
+    </header>
+    <section class="chart-wrap">
+      <svg id="chart" viewBox="0 0 1080 620" role="img"></svg>
+      <div id="tooltip"></div>
+    </section>
+    <div id="detail">Hover for details. Click an item to pin it here.</div>
+  </main>
+  <script>
+
+const cells = [{"source": "君君的旅行日记", "type": "粉丝号", "value": 188}, {"source": "君君的旅行日记", "type": "法律相关号", "value": 2}, {"source": "君君的旅行日记", "type": "营销号", "value": 2}, {"source": "君君的旅行日记", "type": "媒体号", "value": 2}, {"source": "君君的旅行日记", "type": "音乐相关号", "value": 1}, {"source": "君君的旅行日记", "type": "普通用户", "value": 190}, {"source": "新浪娱乐", "type": "粉丝号", "value": 72}, {"source": "新浪娱乐", "type": "法律相关号", "value": 8}, {"source": "新浪娱乐", "type": "营销号", "value": 3}, {"source": "新浪娱乐", "type": "媒体号", "value": 5}, {"source": "新浪娱乐", "type": "音乐相关号", "value": 2}, {"source": "新浪娱乐", "type": "普通用户", "value": 100}, {"source": "梨视频", "type": "粉丝号", "value": 61}, {"source": "梨视频", "type": "法律相关号", "value": 7}, {"source": "梨视频", "type": "营销号", "value": 1}, {"source": "梨视频", "type": "媒体号", "value": 3}, {"source": "梨视频", "type": "音乐相关号", "value": 2}, {"source": "梨视频", "type": "普通用户", "value": 91}, {"source": "新浪热点", "type": "粉丝号", "value": 28}, {"source": "新浪热点", "type": "法律相关号", "value": 10}, {"source": "新浪热点", "type": "营销号", "value": 1}, {"source": "新浪热点", "type": "媒体号", "value": 4}, {"source": "新浪热点", "type": "音乐相关号", "value": 8}, {"source": "新浪热点", "type": "普通用户", "value": 111}, {"source": "蚊子下鸡蛋", "type": "粉丝号", "value": 52}, {"source": "蚊子下鸡蛋", "type": "法律相关号", "value": 1}, {"source": "蚊子下鸡蛋", "type": "营销号", "value": 0}, {"source": "蚊子下鸡蛋", "type": "媒体号", "value": 0}, {"source": "蚊子下鸡蛋", "type": "音乐相关号", "value": 3}, {"source": "蚊子下鸡蛋", "type": "普通用户", "value": 65}, {"source": "王纯迅有想法", "type": "粉丝号", "value": 73}, {"source": "王纯迅有想法", "type": "法律相关号", "value": 1}, {"source": "王纯迅有想法", "type": "营销号", "value": 1}, {"source": "王纯迅有想法", "type": "媒体号", "value": 0}, {"source": "王纯迅有想法", "type": "音乐相关号", "value": 0}, {"source": "王纯迅有想法", "type": "普通用户", "value": 34}, {"source": "Gezelligheid_源轩超管组", "type": "粉丝号", "value": 61}, {"source": "Gezelligheid_源轩超管组", "type": "法律相关号", "value": 0}, {"source": "Gezelligheid_源轩超管组", "type": "营销号", "value": 0}, {"source": "Gezelligheid_源轩超管组", "type": "媒体号", "value": 0}, {"source": "Gezelligheid_源轩超管组", "type": "音乐相关号", "value": 0}, {"source": "Gezelligheid_源轩超管组", "type": "普通用户", "value": 42}, {"source": "娱乐扒皮", "type": "粉丝号", "value": 38}, {"source": "娱乐扒皮", "type": "法律相关号", "value": 0}, {"source": "娱乐扒皮", "type": "营销号", "value": 0}, {"source": "娱乐扒皮", "type": "媒体号", "value": 0}, {"source": "娱乐扒皮", "type": "音乐相关号", "value": 0}, {"source": "娱乐扒皮", "type": "普通用户", "value": 65}, {"source": "何牧歌耶", "type": "粉丝号", "value": 51}, {"source": "何牧歌耶", "type": "法律相关号", "value": 2}, {"source": "何牧歌耶", "type": "营销号", "value": 0}, {"source": "何牧歌耶", "type": "媒体号", "value": 0}, {"source": "何牧歌耶", "type": "音乐相关号", "value": 2}, {"source": "何牧歌耶", "type": "普通用户", "value": 43}, {"source": "南方日报", "type": "粉丝号", "value": 52}, {"source": "南方日报", "type": "法律相关号", "value": 8}, {"source": "南方日报", "type": "营销号", "value": 0}, {"source": "南方日报", "type": "媒体号", "value": 0}, {"source": "南方日报", "type": "音乐相关号", "value": 0}, {"source": "南方日报", "type": "普通用户", "value": 34}, {"source": "腮ilence", "type": "粉丝号", "value": 39}, {"source": "腮ilence", "type": "法律相关号", "value": 0}, {"source": "腮ilence", "type": "营销号", "value": 2}, {"source": "腮ilence", "type": "媒体号", "value": 0}, {"source": "腮ilence", "type": "音乐相关号", "value": 0}, {"source": "腮ilence", "type": "普通用户", "value": 50}, {"source": "张碧晨Studio", "type": "粉丝号", "value": 17}, {"source": "张碧晨Studio", "type": "法律相关号", "value": 3}, {"source": "张碧晨Studio", "type": "营销号", "value": 0}, {"source": "张碧晨Studio", "type": "媒体号", "value": 1}, {"source": "张碧晨Studio", "type": "音乐相关号", "value": 8}, {"source": "张碧晨Studio", "type": "普通用户", "value": 62}];
+const sources = [...new Set(cells.map(d => d.source))];
+const types = [...new Set(cells.map(d => d.type))];
+const svg = document.getElementById("chart"), tooltip = document.getElementById("tooltip"), detail = document.getElementById("detail");
+const W = 1080, H = 620, m = {l: 230, r: 104, t: 50, b: 86};
+const cellW = (W - m.l - m.r) / Math.max(1, types.length);
+const cellH = (H - m.t - m.b) / Math.max(1, sources.length);
+const maxV = Math.max(1, ...cells.map(d => d.value));
+function el(name, attrs, parent = svg) { const node = document.createElementNS("http://www.w3.org/2000/svg", name); Object.entries(attrs).forEach(([k,v]) => node.setAttribute(k,v)); parent.appendChild(node); return node; }
+function color(v) {
+  const t = Math.sqrt(v / maxV);
+  const a = [245,243,238], b = [192,120,88];
+  return `rgb(${Math.round(a[0]+(b[0]-a[0])*t)},${Math.round(a[1]+(b[1]-a[1])*t)},${Math.round(a[2]+(b[2]-a[2])*t)})`;
+}
+function tip(d) { return `<b>${d.source}</b><br>目标账号类型：${d.type}<br>转发边数：${d.value}`; }
+const defs = el("defs", {});
+const grad = el("linearGradient", {id:"heatLegend", x1:"0", y1:"1", x2:"0", y2:"0"}, defs);
+[0, .25, .5, .75, 1].forEach(t => {
+  el("stop", {offset:`${t * 100}%`, "stop-color":color(maxV * t * t)}, grad);
+});
+sources.forEach((s, i) => el("text", {x:m.l-12, y:m.t+i*cellH+cellH/2+4, "text-anchor":"end", class:"label"}).textContent = s.slice(0, 18));
+types.forEach((t, j) => el("text", {x:m.l+j*cellW+cellW/2, y:H-m.b+28, transform:`rotate(25 ${m.l+j*cellW+cellW/2} ${H-m.b+28})`, "text-anchor":"start", class:"label"}).textContent = t);
+cells.forEach(d => {
+  const i = sources.indexOf(d.source), j = types.indexOf(d.type);
+  const rect = el("rect", {x:m.l+j*cellW, y:m.t+i*cellH, width:Math.max(1,cellW-2), height:Math.max(1,cellH-2), fill:color(d.value), stroke:"#fffdf8", class:"mark", "data-kind":d.type});
+  if (d.value > 0) el("text", {x:m.l+j*cellW+cellW/2, y:m.t+i*cellH+cellH/2+4, "text-anchor":"middle", class:"cell-number"}).textContent = d.value;
+  rect.addEventListener("mousemove", e => { tooltip.innerHTML=tip(d); tooltip.style.display="block"; tooltip.style.left=e.clientX+14+"px"; tooltip.style.top=e.clientY+14+"px"; });
+  rect.addEventListener("mouseleave",()=>tooltip.style.display="none");
+  rect.addEventListener("click",()=>detail.innerHTML=tip(d));
+});
+const legendX = W - 72, legendY = m.t, legendH = H - m.t - m.b, legendW = 14;
+el("rect", {x:legendX, y:legendY, width:legendW, height:legendH, fill:"url(#heatLegend)", stroke:"#cfc7bd", "stroke-width":1});
+el("text", {x:legendX + legendW / 2, y:legendY - 12, "text-anchor":"middle", class:"label"}).textContent = "边数";
+[0, .5, 1].forEach(t => {
+  const y = legendY + legendH * (1 - t);
+  el("line", {x1:legendX + legendW, y1:y, x2:legendX + legendW + 6, y2:y, stroke:"#8C8C8C", "stroke-width":1});
+  el("text", {x:legendX + legendW + 10, y:y + 4, class:"label"}).textContent = Math.round(maxV * t);
+});
+const toolbar = document.getElementById("toolbar");
+["全部", ...types].forEach(k => { const b=document.createElement("button"); b.textContent=k; b.onclick=()=>{ document.querySelectorAll("button").forEach(x=>x.classList.remove("active")); b.classList.add("active"); document.querySelectorAll(".mark").forEach(x=>x.classList.toggle("dimmed", k!=="全部" && x.dataset.kind!==k)); }; toolbar.appendChild(b); });
+toolbar.firstChild.classList.add("active");
+
+  </script>
+</body>
+</html>
