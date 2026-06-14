@@ -13,12 +13,12 @@ Twin Annual Rings: Visual Analysis of the Propagation of "Nianlun" Original Sing
 ### 目录结构
 
 ```
-Homework3/
+Twin-Timber-Rings/
 ├── 01_crawler/       # 数据采集代码 (A-D组)
-├── 02_data/          # 原始/清洗/过滤数据 (A-E组)
-├── 03_scripts/       # 数据清洗、分析、可视化代码 (A-E组)
-├── 04_figures/       # 输出图表 HTML+PNG + 整合仪表盘
-└── 05_docs/          # 标签定义 + 设计规范 + 完整项目文档
+├── 02_data/          # 清洗后数据 (CSV)
+├── 03_scripts/       # 数据清洗、分析、标注、可视化代码 (A-E组)
+├── 04_figures/       # 输出图表 (各组子文件夹 + 整合仪表盘)
+└── 05_docs/          # 标签定义 + 风格规范 + 项目文档 + README
 ```
 
 ### 数据来源
@@ -26,11 +26,11 @@ Homework3/
 | 平台 | 数据类型 | 采集时间 |
 |------|---------|---------|
 | 微博 | 主帖、评论、转发 | 2025年7月–9月 |
-| B站 | 视频+热门评论 | 2025年 |
-| 抖音 | 视频+热门评论 | 2025年 |
-| 知乎 | 回答+评论 | 2025年 |
-| 豆瓣 | 帖子+评论 | 2025年 |
-| QQ音乐 | 歌曲评论 | 2025年 |
+| B站 | 视频+热门评论 | 2025年7月–8月 |
+| 抖音 | 视频+热门评论 | 2025年7月–8月 |
+| 知乎 | 回答+评论 | 2025年7月–8月 |
+| 豆瓣 | 帖子+评论 | 2025年7月–8月 |
+| QQ音乐 | 歌曲评论 | 2025年7月–8月 |
 
 ### 研究方法
 
@@ -40,26 +40,25 @@ Homework3/
 
 ### 标签体系
 
-详细定义见 `05_docs/含义.txt`：
+详细定义见 `05_docs/含义.txt` 与 `05_docs/文档/项目文档.md` §2.2，全量数据按以下五维标注：
 
-| 维度 | 可选值 |
-|------|--------|
-| **stance** 立场 | `support_zhang` / `support_wang` / `neutral` / `anti_fanwar` / `unclear` |
-| **frame** 叙事框架 | `original_singer` / `copyright_authorization` / `creator_identity` / `memory_emotion` / `legal_discussion` / `fan_conflict` / `platform_meta` / `unclear` |
-| **emotion** 情绪 | `angry` / `sad` / `mocking` / `supportive` / `neutral` / `confused` / `unclear` |
-| **event_stage** 事件阶段 | `pre_event` / `outbreak` / `response` / `debate` / `cooldown` |
+| 维度 | 可选值 | 方法 |
+|------|--------|------|
+| **stance** 立场 | `support_zhang` / `support_wang` / `neutral` / `anti_fanwar` / `unclear` | 规则+LLM |
+| **frame** 叙事框架 | `original_singer` / `copyright_authorization` / `creator_identity` / `memory_emotion` / `legal_discussion` / `fan_conflict` / `platform_meta` | 规则+ML+LLM |
+| **event_stage** 事件阶段 | `pre_event` / `outbreak` / `response` / `debate` / `cooldown` | 时间边界映射 |
+| **keyword_hit** 关键词命中 | 多值（逗号分隔） | 29条规则字符串匹配 |
+| **author_type** 用户身份 | 汪苏泷粉丝 / 张碧晨粉丝 / 汪方水军 / 张方水军 / 路人 / 媒体·官方 | 文本打分+主页爬取验证 |
 
 ### 各组分工
 
-| 组 | 姓名 | 角色 | 一句话定位 | 核心产出 |
-|----|------|------|-----------|---------|
-| **A** | 平倩如 | 时间线与热度分析 | 我负责说明事件何时爆发。 | 图1 事件时间线、图2 热度趋势 |
-| **B** | 宋薇 | 立场与情绪分析 | 我负责说明网友如何站队和表达情绪。 | 图3 立场分布、图4 双阵营词云对比、图5 立场流变、图18 同质化内容分布 |
-| **C** | 陈子怡 | 传播链与网络分析 | 我负责说明微博传播网络如何扩散。 | 图6 传播网络、图7 Top源帖子、图8 Top转发节点、图9 账号类型网络、图10 传播矩阵 |
-| **D** | 张欣 | 关键词与叙事分析 | 我负责说明争议叙事如何演化。 | 图11 关键词Top30、图12 叙事桑基图、图15 双阵营框架对比、图16 豆瓣证据链、图17 双生起源时间轴、图19 主帖vs评论vs转发立场对比 |
-| **E** | 严宇畅 | 双生年轮与整合 | 我负责把"双生年轮"概念做成最终展示。 | 图13 双生年轮、图14 平台对比、整合仪表盘 |
-
-> **A 做时间，B 做态度，C 做传播，D 做内容，E 做双生概念和最终整合。**
+| 组 | 姓名 | 角色 | 核心产出 |
+|----|------|------|---------|
+| **A** | 平倩如 | 时间线与热度分析 | 图1 事件时间线、图2 热度趋势 |
+| **B** | 宋薇 | 立场分析 | 图3 立场分布、图4 双阵营词云对比、图5 立场流变、图18 同质化内容分布 |
+| **C** | 陈子怡 | 传播链与网络分析 | 图6 传播网络、图7 Top源帖子、图8 Top转发节点、图9 账号类型网络、图10 传播矩阵 |
+| **D** | 张欣 | 关键词与叙事分析 | 图11 关键词Top30、图12 叙事桑基图、图15 双阵营框架对比、图16 豆瓣证据链、图17 双生起源时间轴、图19 立场对比 |
+| **E** | 严宇畅 | 双生年轮与整合 | 图13 双生年轮、图14 平台对比、整合仪表盘 |
 
 ---
 
@@ -141,15 +140,17 @@ python 03_scripts/C_scripts/labeling/llm_stance_c_reposts.py
 python 03_scripts/A_scripts/visualization/fig_01_event_timeline.py
 python 03_scripts/A_scripts/visualization/fig_02_heat_trend.py
 
-# ------ B组: 图3-5 立场与情绪 ------
+# ------ B组: 图3-5 立场 ------
 python 03_scripts/B_scripts/visualization/plot_fig03_fig04.py
 python 03_scripts/B_scripts/visualization/plot_fig05_stance_over_time.py
+python 03_scripts/B_scripts/visualization/visualize_duplicate_distribution.py
 
-# ------ C组: 图6-9 传播网络 ------
+# ------ C组: 图6-10 传播网络 ------
 python 03_scripts/C_scripts/visualization/analyze_repost_network.py
 
-# ------ D组: 图10-13 关键词与叙事 ------
+# ------ D组: 图11-12 关键词与叙事 ------
 python 03_scripts/D_scripts/visualization/D_analysis_v2.py
+python 03_scripts/D_scripts/visualization/fig_posts_vs_comments.py
 
 # ------ E组: 图13-14 双生年轮与平台对比 ------
 python 03_scripts/E_scripts/visualization/fig_13_twin_rings.py
@@ -158,7 +159,7 @@ python 03_scripts/E_scripts/visualization/fig_14_platform_comparison.py
 
 ### 第五步：查看结果
 
-所有图表输出至 `04_figures/` 下各组对应文件夹：
+所有图表输出至 `04_figures/` 下各组对应文件夹，完整集合见 `04_figures/dashboard/figures/`：
 
 - **HTML 文件** — 浏览器直接打开，支持交互
 - **PNG 文件** — 静态图片，适用于 PPT / 报告
@@ -188,10 +189,10 @@ python 03_scripts/E_scripts/visualization/fig_14_platform_comparison.py
 | 图4 | 双阵营词云对比 | B | PNG |
 | 图5 | 立场流变：网友态度的阶段演化 | B | HTML+PNG |
 | 图6 | 传播网络：核心微博与转发节点 | C | HTML+PNG |
-| 图7 | Top源帖子分析 | C | PNG |
-| 图8 | Top转发节点分析 | C | PNG |
+| 图7 | Top源帖子分析 | C | HTML+PNG |
+| 图8 | Top转发节点分析 | C | HTML+PNG |
 | 图9 | 账号类型网络分析 | C | HTML+PNG |
-| 图10 | 源类型传播矩阵 | C | PNG |
+| 图10 | 源类型传播矩阵 | C | HTML+PNG |
 | 图11 | 关键词Top30 | D | HTML+PNG |
 | 图12 | 叙事桑基图：关键词如何流向立场 | D | HTML+PNG |
 | 图13 | 双生年轮：两套叙事的并行生长 | E | HTML+PNG |
@@ -257,8 +258,9 @@ python 03_scripts/E_scripts/visualization/fig_14_platform_comparison.py
 
 ## 交付物
 
-- `04_figures/` — 所有图表文件（HTML + PNG）
+- `04_figures/` — 所有图表文件（HTML + PNG），各组子文件夹分类存放
 - `04_figures/dashboard/twin_rings_dashboard_reconstructed.html` — 整合仪表盘
+- `04_figures/dashboard/figures/` — 仪表盘引用图集（含全部产出）
 - `05_docs/含义.txt` — 标签定义说明
 - `05_docs/风格规范.md` — 完整设计规范
 - `05_docs/文档/项目文档.md` — 完整项目分析文档
@@ -270,7 +272,7 @@ python 03_scripts/E_scripts/visualization/fig_14_platform_comparison.py
 | 成员 | 姓名 | 专业班级 | 学号 | 角色 | 答辩内容 |
 |------|------|:-------:|:----:|------|---------|
 | A | 平倩如 | 计科2303 | 2312190307 | 时间线与热度分析 | 时间线和热度峰值 |
-| B | 宋薇 | 计科2303 | 2312190317 | 立场与情绪分析 | 立场、情绪、高赞评论 |
+| B | 宋薇 | 计科2303 | 2312190317 | 立场分析 | 立场、高赞评论 |
 | C | 陈子怡 | 计科2303 | 2312190329 | 传播链与网络分析 | 转发网络、核心节点、传播路径 |
 | D | 张欣 | 计科2303 | 2312190333 | 关键词与叙事分析 | 关键词演化和叙事桑基图 |
 | E | 严宇畅 | 大数据2401 | 2402100117 | 总设计与整合 | 主视觉、平台差异、总结观点 |
